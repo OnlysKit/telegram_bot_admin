@@ -45,9 +45,13 @@ def require_auth(session_id: str = Cookie(None)):
     return True
 
 @app.get("/")
-async def root():
+async def root(session_id: str = Cookie(None)):
     """Корневой эндпоинт"""
-    return {"message": "Добро пожаловать в Tableman API!"}
+    # Проверяем, залогинен ли пользователь
+    if verify_session(session_id):
+        return RedirectResponse(url="/products")
+    else:
+        return RedirectResponse(url="/login")
 
 
 @app.get("/login")
