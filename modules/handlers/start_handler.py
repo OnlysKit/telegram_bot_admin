@@ -28,14 +28,16 @@ async def cmd_start(message: types.Message, command: Command):
     source = None
     product = None
     
-    params = link_args.split('_')
-    
-    for param in params:
-        key, value = param.split('-')
-        if key == 's':
-            source = value
-        elif key == 'p':
-            product = value
+    if link_args:
+        
+        params = link_args.split('_')
+        
+        for param in params:
+            key, value = param.split('-')
+            if key == 's':
+                source = value
+            elif key == 'p':
+                product = value
 
     user_data = await db.get_one_generic_async(table='users', user_id=user_id)
     
@@ -45,4 +47,4 @@ async def cmd_start(message: types.Message, command: Command):
         
     await create_topic(user_id)
     
-    await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: {source}")
+    await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: #{source}\nПродукт: #{product}")
