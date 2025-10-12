@@ -1,0 +1,374 @@
+/* Общие стили для всего приложения */
+
+/* Базовые стили */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+    margin: 0;
+    padding: 0;
+}
+
+/* Контейнеры */
+.container {
+    background-color: #2d2d2d;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    border: 1px solid #404040;
+}
+
+/* Заголовки */
+h1 {
+    color: #ffffff;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Формы */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+input[type="text"], 
+input[type="number"], 
+input[type="password"], 
+textarea, 
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #555;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+}
+
+input[type="text"]:focus, 
+input[type="number"]:focus, 
+input[type="password"]:focus, 
+textarea:focus, 
+select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+textarea {
+    height: 100px;
+    resize: vertical;
+}
+
+/* Чекбоксы */
+.checkbox-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+    accent-color: #60a5fa;
+}
+
+/* Кнопки */
+.btn {
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-secondary {
+    background-color: #6b7280;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #4b5563;
+}
+
+.btn-delete {
+    background-color: #ef4444;
+    color: white;
+    text-decoration: none;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    display: inline-block;
+    text-align: center;
+    transition: background-color 0.2s;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.btn-delete:hover {
+    background-color: #dc2626;
+    color: white;
+    text-decoration: none;
+}
+
+/* Группы кнопок */
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+/* Статистика */
+.stats {
+    background-color: #1e3a5f;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    text-align: center;
+    border: 1px solid #2d4a6b;
+}
+
+.stats span {
+    font-weight: bold;
+    color: #60a5fa;
+}
+
+/* Фильтры */
+.filter-section {
+    background-color: #3a3a3a;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.filter-label {
+    color: #ffffff;
+    font-weight: bold;
+    margin: 0;
+}
+
+.filter-select {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 5px;
+    padding: 8px 12px;
+    font-size: 14px;
+    min-width: 200px;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+/* Сообщения об ошибках */
+.error-message {
+    background-color: #2d1b1b;
+    color: #f87171;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #3f1f1f;
+}
+
+/* Информационные сообщения */
+.login-info {
+    background-color: #1e3a5f;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #2d4a6b;
+    font-size: 14px;
+}
+
+.login-info strong {
+    color: #60a5fa;
+}
+
+/* Обязательные поля */
+.required {
+    color: #f87171;
+}
+
+/* Подсказки */
+.help-text {
+    font-size: 14px;
+    color: #a0a0a0;
+    margin-top: 5px;
+}
+
+/* Пустые состояния */
+.no-products, .no-users {
+    text-align: center;
+    color: #888;
+    font-style: italic;
+    padding: 40px;
+}
+
+/* Бейджи */
+.role-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.role-admin {
+    background-color: #dc2626;
+    color: white;
+}
+
+.role-moderator {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.role-user {
+    background-color: #6b7280;
+    color: white;
+}
+
+.banned {
+    background-color: #ef4444;
+    color: white;
+}
+
+.active {
+    background-color: #10b981;
+    color: white;
+}
+
+/* Модальные окна */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #2d2d2d;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #555;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    text-align: left;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    color: #ffffff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.close {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #ffffff;
+}
+
+.modal-body {
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.modal-body input {
+    width: 100%;
+    padding: 10px;
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.modal-body input:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.btn-modal {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.btn-modal-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-modal-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-modal-secondary {
+    background-color: #6b7280;
+    color: white;
+}
+
+.btn-modal-secondary:hover {
+    background-color: #4b5563;
+}

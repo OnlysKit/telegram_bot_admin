@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список продуктов</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/products.css">
+</head>
+<body>
+    <div class="container">
+        <!-- <h1>Список продуктов</h1> -->
+        
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: space-between; align-items: center;">
+            {% if is_authenticated %}
+                <div style="display: flex; gap: 15px;">
+                    <a href="/add-product" class="add-product-btn">+ Добавить продукт</a>
+                    <a href="/add-bot" class="add-product-btn" style="background-color: #17a2b8;">+ Добавить бота</a>
+                    <a href="/users" class="add-product-btn" style="background-color: #7c3aed;">👥 Пользователи</a>
+                </div>
+            {% else %}
+                <div style="display: flex; gap: 15px;">
+                    <span style="color: #a0a0a0; font-style: italic;">Для управления продуктами требуется авторизация</span>
+                </div>
+                <a href="/login" class="add-product-btn login-btn">🔐 Войти</a>
+            {% endif %}
+        </div>
+        
+        <div class="filter-section">
+            <div class="filter-group">
+                <label for="bot-filter" class="filter-label">Фильтр по боту:</label>
+                <select id="bot-filter" class="filter-select" onchange="filterByBot()">
+                    <option value="all" {% if not selected_bot_id or selected_bot_id == 'all' %}selected{% endif %}>Все боты</option>
+                    {% for bot in bots %}
+                        <option value="{{ bot.bot_id }}" {% if selected_bot_id == bot.bot_id|string %}selected{% endif %}>{{ bot.title }} (@{{ bot.bot_username }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <div class="stats">
+            Всего продуктов: <span>{{ products|length }}</span>
+        </div>
+        
+        {% if products %}
+            <div class="products-grid">
+                {% for product in products %}
+                    <div class="product-card" onclick="window.location.href='/edit-product/{{ product.id }}'">
+                        <div class="product-title">{{ product.title }}</div>
+                        {% if product.description %}
+                            <div class="product-description">{{ product.description }}</div>
+                        {% endif %}
+                        
+                        <div class="product-price">
+                            {% if product.is_free %}
+                                <span class="product-free">Бесплатно</span>
+                            {% else %}
+                                {% if product.price and product.price > 0 %}
+                                    {% if product.discount and product.discount > 0 %}
+                                        {% set final_price = product.price * (100 - product.discount) / 100 %}
+                                        <span class="original-price" style="text-decoration: line-through; color: #888; margin-right: 8px;">{{ product.price }} ₽</span>
+                                        <span class="discounted-price" style="color: #4ade80; font-weight: bold;">{{ final_price|round|int }} ₽</span>
+                                        <span class="product-discount">-{{ product.discount }}%</span>
+                                    {% else %}
+                                        {{ product.price }} ₽
+                                    {% endif %}
+                                {% else %}
+                                    Цена не указана
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        
+                        <div class="product-meta">
+                            {% if product.file_type %}
+                                <div>Тип: {{ product.file_type.upper() }}</div>
+                            {% endif %}
+                            {% if product.bot_title %}
+                                <div>Бот: {{ product.bot_title }} (@{{ product.bot_username }})</div>
+                            {% endif %}
+                        </div>
+                        
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-products">
+                Продукты не найдены
+            </div>
+        {% endif %}
+    </div>
+
+    <script src="/static/js/products.js"></script>
+</body>
+</html>

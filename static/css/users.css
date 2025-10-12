@@ -1,0 +1,248 @@
+/* Специфичные стили для страницы пользователей */
+body {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Фильтры уже в общем styles.css */
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #3a3a3a;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.users-table th {
+    background-color: #4a4a4a;
+    color: #ffffff;
+    padding: 15px 10px;
+    text-align: left;
+    font-weight: bold;
+    border-bottom: 2px solid #555;
+}
+
+.users-table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #555;
+    vertical-align: top;
+}
+
+.users-table tr:hover {
+    background-color: #4a4a4a;
+}
+
+.user-id {
+    font-weight: bold;
+    color: #60a5fa;
+}
+
+.username {
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.role-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.role-admin {
+    background-color: #dc2626;
+    color: white;
+}
+
+.role-moderator {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.role-user {
+    background-color: #6b7280;
+    color: white;
+}
+
+.banned {
+    background-color: #ef4444;
+    color: white;
+}
+
+.active {
+    background-color: #10b981;
+    color: white;
+}
+
+.user-actions {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background-color 0.2s;
+}
+
+.btn button {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+    transition: background-color 0.2s;
+    background: inherit;
+    color: inherit;
+    width: 100%;
+}
+
+.btn-ban {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-ban:hover {
+    background-color: #dc2626;
+}
+
+.btn-unban {
+    background-color: #10b981;
+    color: white;
+}
+
+.btn-unban:hover {
+    background-color: #059669;
+}
+
+.btn-delete {
+    background-color: #6b7280;
+    color: white;
+}
+
+.btn-delete:hover {
+    background-color: #4b5563;
+}
+
+.btn-role {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-role:hover {
+    background-color: #2563eb;
+}
+
+.role-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.role-dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #2d2d2d;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.3);
+    z-index: 1;
+    border: 1px solid #555;
+    border-radius: 4px;
+}
+
+.role-dropdown-content a {
+    color: #e0e0e0;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+    font-size: 12px;
+}
+
+.role-dropdown-content a:hover {
+    background-color: #4a4a4a;
+}
+
+.role-dropdown:hover .role-dropdown-content {
+    display: block;
+}
+
+/* .no-users уже в общем styles.css */
+
+.user-info {
+    font-size: 12px;
+    color: #a0a0a0;
+}
+
+.bot-info {
+    font-size: 11px;
+    color: #60a5fa;
+}
+
+.inline-dropdown {
+    width: 100%;
+}
+
+.inline-select {
+    width: 100%;
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.inline-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.inline-select option {
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+}
+
+.role-select {
+    background-color: #3a3a3a;
+    color: #e0e0e0;
+    border: 1px solid #555;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.role-select:focus {
+    outline: none;
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.2);
+}
+
+.clickable-source {
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.clickable-source:hover {
+    background-color: #4a4a4a;
+}
+
+/* Модальные окна уже в общем styles.css */

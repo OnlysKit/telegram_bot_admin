@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление пользователями</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/users.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Управление пользователями</h1>
+        
+        <div style="display: flex; gap: 15px; margin-bottom: 20px; justify-content: space-between; align-items: center;">
+            {% if is_authenticated %}
+                <div style="display: flex; gap: 15px;">
+                    <a href="/products" class="btn" style="background-color: #16a34a; padding: 10px 20px;">📦 Продукты</a>
+                </div>
+            {% else %}
+                <div style="display: flex; gap: 15px;">
+                    <span style="color: #a0a0a0; font-style: italic;">Для управления пользователями требуется авторизация</span>
+                </div>
+                <a href="/login" class="btn login-btn" style="background-color: #4b5563; color: #a0a0a0; border: 1px solid #6b7280; padding: 10px 20px;">🔐 Войти</a>
+            {% endif %}
+        </div>
+        
+        {% if is_authenticated %}
+            <div class="filter-section">
+                <div class="filter-group">
+                    <label for="bot-filter" class="filter-label">Фильтр по боту:</label>
+                    <select id="bot-filter" class="filter-select" onchange="filterByBot()">
+                        <option value="all" {% if not selected_bot_id or selected_bot_id == 'all' %}selected{% endif %}>Все боты</option>
+                        {% for bot in bots %}
+                            <option value="{{ bot.bot_id }}" {% if selected_bot_id == bot.bot_id|string %}selected{% endif %}>{{ bot.title }} (@{{ bot.bot_username }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            
+            <div class="stats">
+                Всего пользователей: <span>{{ users|length }}</span>
+            </div>
+            
+            {% if users %}
+                <table class="users-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя пользователя</th>
+                            <th>Полное имя</th>
+                            <th>Роль</th>
+                            <th>Статус</th>
+                            <th>Тариф</th>
+                            <th>Бот</th>
+                            <th>Источник</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                            <tr>
+                                <td class="user-id">{{ user.user_id }}</td>
+                                <td class="username">@{{ user.username or 'Не указан' }}</td>
+                                <td>
+                                    {{ user.first_name or '' }} {{ user.last_name or '' }}
+                                    {% if not user.first_name and not user.last_name %}
+                                        <span class="user-info">Не указано</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="inline-dropdown">
+                                        <select onchange='changeRole({{ user.user_id }}, this.value)' class="inline-select role-select">
+                                            <option value="user" {% if not user.is_admin and not user.is_moderator %}selected{% endif %}>Пользователь</option>
+                                            <option value="moderator" {% if user.is_moderator %}selected{% endif %}>Модератор</option>
+                                            <option value="admin" {% if user.is_admin %}selected{% endif %}>Админ</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    {% if user.banned %}
+                                        <span class="role-badge banned">Заблокирован</span>
+                                    {% else %}
+                                        <span class="role-badge active">Активен</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="inline-dropdown">
+                                        <select onchange='changeTariff({{ user.user_id }}, this.value)' class="inline-select">
+                                            <option value="">Без тарифа</option>
+                                            {% for tariff_key, tariff_data in tariffs.items() %}
+                                                <option value="{{ tariff_key }}" {% if user.tariff == tariff_key %}selected{% endif %}>{{ tariff_data.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="inline-dropdown">
+                                        <select onchange='changeBot({{ user.user_id }}, this.value)' class="inline-select">
+                                            <option value="">Не указан</option>
+                                            {% for bot in bots %}
+                                                <option value="{{ bot.bot_id }}" {% if user.bot_id == bot.bot_id %}selected{% endif %}>{{ bot.title }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="user-info clickable-source" onclick='openSourceModal({{ user.user_id }}, "{{ user.source or "" }}")'>
+                                        {{ user.source or 'Не указан' }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="user-actions">
+                                        {% if user.banned %}
+                                            <form method="POST" action="/users/{{ user.user_id }}/ban" style="display: inline;" onsubmit="return confirm('Разблокировать пользователя?')">
+                                                <button type="submit" class="btn btn-unban">Разблокировать</button>
+                                            </form>
+                                        {% else %}
+                                            <form method="POST" action="/users/{{ user.user_id }}/ban" style="display: inline;" onsubmit="return confirm('Заблокировать пользователя?')">
+                                                <button type="submit" class="btn btn-ban">Заблокировать</button>
+                                            </form>
+                                        {% endif %}
+                                        
+                                        
+                                        <a href="/users/{{ user.user_id }}/delete" class="btn btn-delete" onclick="return confirm('Удалить пользователя? Это действие необратимо!')">Удалить</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <div class="no-users">
+                    Пользователи не найдены
+                </div>
+            {% endif %}
+        {% endif %}
+    </div>
+
+    <!-- Модальное окно для изменения источника -->
+    <div id="sourceModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Изменить источник пользователя</h3>
+                <span class="close" onclick="closeSourceModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div style="width: 100%;">
+                    <input type="text" id="sourceInput" placeholder="Введите источник пользователя">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal btn-modal-secondary" onclick="closeSourceModal()">Отмена</button>
+                <button class="btn-modal btn-modal-primary" onclick="saveSource()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/users.js"></script>
+</body>
+</html>

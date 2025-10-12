@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Добавить бота</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/add_bot.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Добавить нового бота</h1>
+        
+        {% if error %}
+            <div class="error-message">
+                {{ error }}
+            </div>
+        {% endif %}
+        
+        <form method="post" action="/add-bot">
+            <div class="form-group">
+                <label for="title">Название бота <span class="required">*</span></label>
+                <input type="text" id="title" name="title" required placeholder="Мой бот">
+                <div class="help-text">Название бота для отображения</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bot_id">ID бота <span class="required">*</span></label>
+                <input type="number" id="bot_id" name="bot_id" required placeholder="123456789">
+                <div class="help-text">Числовой ID бота от BotFather</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bot_token">Токен бота <span class="required">*</span></label>
+                <input type="text" id="bot_token" name="bot_token" required placeholder="123456789:ABCdefGHIjklMNOpqrsTUVwxyz">
+                <div class="help-text">Токен бота от BotFather</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="bot_username">Username бота <span class="required">*</span></label>
+                <input type="text" id="bot_username" name="bot_username" required placeholder="my_bot">
+                <div class="help-text">Username бота (без @)</div>
+            </div>
+            
+            <div class="button-group">
+                <button type="submit" class="btn btn-primary">Добавить бота</button>
+                <a href="/products" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
