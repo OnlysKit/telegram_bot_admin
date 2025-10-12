@@ -94,6 +94,44 @@
                 <div class="help-text">Путь к файлу продукта на сервере</div>
             </div>
             
+            <div class="form-group">
+                <label for="link">Ссылка</label>
+                <input type="text" id="link" name="link" placeholder="traver_manual" value="{% if product %}{{ product.link }}{% endif %}">
+                <div class="help-text">https://t.me/BotNameBot?start=...</div>
+            </div>
+            
+            {% if is_edit %}
+                <div class="form-group">
+                    <label>Telegram File ID</label>
+                    <div class="telegram-id-field">
+                        <input type="text" value="{% if product.telegram_file_id %}{{ product.telegram_file_id }}{% else %}Не установлен{% endif %}" readonly>
+                        {% if product.telegram_file_id %}
+                            <button type="button" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" onclick="resetTelegramId('file', {{ product.id }})">Сбросить</button>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Telegram Video ID</label>
+                    <div class="telegram-id-field">
+                        <input type="text" value="{% if product.telegram_video_id %}{{ product.telegram_video_id }}{% else %}Не установлен{% endif %}" readonly>
+                        {% if product.telegram_video_id %}
+                            <button type="button" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" onclick="resetTelegramId('video', {{ product.id }})">Сбросить</button>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Telegram Image ID</label>
+                    <div class="telegram-id-field">
+                        <input type="text" value="{% if product.telegram_image_id %}{{ product.telegram_image_id }}{% else %}Не установлен{% endif %}" readonly>
+                        {% if product.telegram_image_id %}
+                            <button type="button" class="btn btn-secondary" style="padding: 8px 16px; font-size: 14px;" onclick="resetTelegramId('image', {{ product.id }})">Сбросить</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+            
             <div class="button-group">
                 <button type="submit" class="btn btn-primary">{% if is_edit %}Обновить продукт{% else %}Добавить продукт{% endif %}</button>
                 <a href="/products" class="btn btn-secondary">Отмена</a>
@@ -103,5 +141,7 @@
             </div>
         </form>
     </div>
+
+    <script src="/static/js/add_product.js"></script>
 </body>
 </html>

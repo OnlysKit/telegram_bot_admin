@@ -121,6 +121,8 @@ async def show_products(request: Request, bot_id: str = None, session_id: str = 
         bot_title = bot_info.get('title', '')
         bot_username = bot_info.get('bot_username', '')
         
+        link = product.get('link') or ''
+        
         products_list.append({
             'id': product_id,
             'title': title,
@@ -134,7 +136,8 @@ async def show_products(request: Request, bot_id: str = None, session_id: str = 
             'product_bot_id': product_bot_id,
             'bot_title': bot_title,
             'bot_username': bot_username,
-            'path': path
+            'path': path,
+            'link': link
         })
     
     return templates.TemplateResponse("products.html", {
@@ -171,14 +174,31 @@ async def add_product(
     file_type: str = Form(""),
     bot_id: str = Form(""),
     path: str = Form(""),
+    link: str = Form(""),
     auth: bool = Depends(require_auth)
 ):
     """Добавляет новый продукт в базу данных"""
     
     try:
+        # Обрабатываем пустые поля - заменяем на None
+        def process_field(value):
+            return None if not value or value.strip() == "" else value
+        
         # Вставляем продукт в базу данных
-        columns = ["title", "description", "image", "video", "is_free", "price", "discount", "file_type", "product_bot", "path"]
-        values = [title, description, image, video, is_free, price, discount, file_type, bot_id, path]
+        columns = ["title", "description", "image", "video", "is_free", "price", "discount", "file_type", "product_bot", "path", "link"]
+        values = [
+            title, 
+            process_field(description), 
+            process_field(image), 
+            process_field(video), 
+            is_free, 
+            price, 
+            discount, 
+            process_field(file_type), 
+            process_field(bot_id), 
+            process_field(path), 
+            process_field(link)
+        ]
         await db.insert_async(columns, values, "products")
         
         # Перенаправляем на страницу со списком продуктов
@@ -240,22 +260,28 @@ async def update_product(
     file_type: str = Form(""),
     bot_id: str = Form(""),
     path: str = Form(""),
+    link: str = Form(""),
     auth: bool = Depends(require_auth)
 ):
     """Обновляет продукт в базе данных"""
     
+    # Обрабатываем пустые поля - заменяем на None
+    def process_field(value):
+        return None if not value or value.strip() == "" else value
+    
     # Подготавливаем данные для обновления
     product_data = {
         'title': title,
-        'description': description,
-        'image': image,
-        'video': video,
+        'description': process_field(description),
+        'image': process_field(image),
+        'video': process_field(video),
         'is_free': 1 if is_free == "1" else 0,
         'price': price,
         'discount': discount,
-        'file_type': file_type,
-        'product_bot': bot_id,
-        'path': path
+        'file_type': process_field(file_type),
+        'product_bot': process_field(bot_id),
+        'path': process_field(path),
+        'link': process_field(link)
     }
     
     try:
@@ -300,7 +326,15 @@ async def add_bot(
     """Добавляет нового бота в базу данных"""
     
     try:
-        await db.insert_async(["title", "bot_id", "bot_token", "bot_username"], [title, bot_id, bot_token, bot_username], table='bots')
+        # Обрабатываем пустые поля - заменяем на None
+        def process_field(value):
+            return None if not value or value.strip() == "" else value
+        
+        await db.insert_async(
+            ["title", "bot_id", "bot_token", "bot_username"], 
+            [process_field(title), bot_id, process_field(bot_token), process_field(bot_username)], 
+            table='bots'
+        )
         return RedirectResponse(url="/products", status_code=303)
     except Exception as e:
         return templates.TemplateResponse("add_bot.html", {
@@ -438,9 +472,40 @@ async def delete_user(user_id: int, auth: bool = Depends(require_auth)):
         return {"error": f"Ошибка при удалении пользователя: {str(e)}"}
 
 
+@app.post("/products/{product_id}/reset-telegram-file")
+async def reset_telegram_file_id(product_id: int, auth: bool = Depends(require_auth)):
+    """Сбрасывает Telegram File ID продукта"""
+    try:
+        await db.update_generic_async("products", ["telegram_file_id"], [None], id=product_id)
+        return RedirectResponse(url=f"/edit-product/{product_id}", status_code=303)
+    except Exception as e:
+        return {"error": f"Ошибка при сбросе Telegram File ID: {str(e)}"}
+
+
+@app.post("/products/{product_id}/reset-telegram-video")
+async def reset_telegram_video_id(product_id: int, auth: bool = Depends(require_auth)):
+    """Сбрасывает Telegram Video ID продукта"""
+    try:
+        await db.update_generic_async("products", ["telegram_video_id"], [None], id=product_id)
+        return RedirectResponse(url=f"/edit-product/{product_id}", status_code=303)
+    except Exception as e:
+        return {"error": f"Ошибка при сбросе Telegram Video ID: {str(e)}"}
+
+
+@app.post("/products/{product_id}/reset-telegram-image")
+async def reset_telegram_image_id(product_id: int, auth: bool = Depends(require_auth)):
+    """Сбрасывает Telegram Image ID продукта"""
+    try:
+        await db.update_generic_async("products", ["telegram_image_id"], [None], id=product_id)
+        return RedirectResponse(url=f"/edit-product/{product_id}", status_code=303)
+    except Exception as e:
+        return {"error": f"Ошибка при сбросе Telegram Image ID: {str(e)}"}
+
+
 async def create_tables():
     await db.creator(table='products', column_types={'title': 'TEXT', 'description': 'TEXT', 'image': 'TEXT', 'video': 'TEXT', 'is_free': 'INTEGER',
-                                               'price': 'INTEGER', 'discount': 'INTEGER', 'file_type': 'TEXT', 'product_bot': 'TEXT', 'path': 'TEXT'})
+                                               'price': 'INTEGER', 'discount': 'INTEGER', 'file_type': 'TEXT', 'product_bot': 'TEXT', 'path': 'TEXT', 'link': 'TEXT',
+                                               'telegram_file_id': 'TEXT', 'telegram_video_id': 'TEXT', 'telegram_image_id': 'TEXT'})
     await db.creator(table='bots', column_types={'title': 'TEXT', 'bot_id': 'INTEGER', 'bot_token': 'TEXT', 'bot_username': 'TEXT'})
     await db.creator(table='users', column_types={'user_id': 'INTEGER', 'topic_id': 'INTEGER', 'username': 'TEXT',
                                                'first_name': 'TEXT', 'last_name': 'TEXT', 'source': 'TEXT', 

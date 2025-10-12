@@ -77,6 +77,9 @@
                             {% if product.bot_title %}
                                 <div>Бот: {{ product.bot_title }} (@{{ product.bot_username }})</div>
                             {% endif %}
+                            {% if product.link %}
+                                <div><a href="https://t.me/{{ product.link }}" target="_blank" style="color: #60a5fa; text-decoration: none;">🔗 {{ product.link }}</a></div>
+                            {% endif %}
                         </div>
                         
                     </div>
