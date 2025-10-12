@@ -19,14 +19,16 @@ async def cmd_start(message: types.Message, command: Command):
     username = message.from_user.username
     first_name = message.from_user.first_name
     last_name = message.from_user.last_name
-    source = command.args
+    link_args = command.args
+    
+    print(link_args)
 
-    user_data = await db.get_one_generic_async(table='users', user_id=user_id)
+    # user_data = await db.get_one_generic_async(table='users', user_id=user_id)
     
-    if not user_data:
-        await db.insert_async(columns=['user_id', 'username', 'first_name', 'last_name', 'source'],
-                            values=[user_id, username, first_name, last_name, source], table='users')
+    # if not user_data:
+    #     await db.insert_async(columns=['user_id', 'username', 'first_name', 'last_name', 'source'],
+    #                         values=[user_id, username, first_name, last_name, source], table='users')
         
-    await create_topic(user_id)
+    # await create_topic(user_id)
     
-    await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: {source}")
+    # await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: {source}")
