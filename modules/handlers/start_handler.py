@@ -12,6 +12,10 @@ from modules.utils.topic_creator import create_topic
 
 router = Router()
 
+# Пример ссылки:
+# https://t.me/EasyDayBot?start=p-manual_s-google
+# получится product = manual, source = google
+
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, command: Command):
     
@@ -21,14 +25,24 @@ async def cmd_start(message: types.Message, command: Command):
     last_name = message.from_user.last_name
     link_args = command.args
     
-    print(link_args)
+    source = None
+    product = None
+    
+    params = link_args.split('_')
+    
+    for param in params:
+        key, value = param.split('-')
+        if key == 's':
+            source = value
+        elif key == 'p':
+            product = value
 
-    # user_data = await db.get_one_generic_async(table='users', user_id=user_id)
+    user_data = await db.get_one_generic_async(table='users', user_id=user_id)
     
-    # if not user_data:
-    #     await db.insert_async(columns=['user_id', 'username', 'first_name', 'last_name', 'source'],
-    #                         values=[user_id, username, first_name, last_name, source], table='users')
+    if not user_data:
+        await db.insert_async(columns=['user_id', 'username', 'first_name', 'last_name', 'source'],
+                            values=[user_id, username, first_name, last_name, source], table='users')
         
-    # await create_topic(user_id)
+    await create_topic(user_id)
     
-    # await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: {source}")
+    await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: {source}")
