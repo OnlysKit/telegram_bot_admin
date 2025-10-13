@@ -70,7 +70,7 @@ async def get_user_topic_id(user_id):
         return None
 
 
-async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_markup=None):
+async def send_message_to_user_topic(user_id, text, parse_mode=None, reply_markup=None, entities=None):
     """
     Отправляет сообщение в тему пользователя в супергруппе
     
@@ -79,6 +79,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_mar
         text: Текст сообщения
         parse_mode: Режим парсинга (HTML, Markdown)
         reply_markup: Клавиатура для сообщения
+        entities: Сущности для сообщения
     
     Returns:
         bool: True если сообщение отправлено успешно, False иначе
@@ -90,6 +91,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_mar
                 chat_id=user_id, 
                 text=text, 
                 parse_mode=parse_mode,
+                entities=entities,
                 reply_markup=reply_markup
             )
             return True
@@ -109,6 +111,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_mar
             message_thread_id=topic_id,
             text=text,
             parse_mode=parse_mode,
+            entities=entities,
             reply_markup=reply_markup
         )
         return True
@@ -120,6 +123,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_mar
                 chat_id=user_id, 
                 text=text, 
                 parse_mode=parse_mode,
+                entities=entities,
                 reply_markup=reply_markup
             )
             return True
@@ -128,7 +132,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode="HTML", reply_mar
             return False
 
 
-async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, reply_markup=None):
+async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, reply_markup=None, entities=None):
     """
     Отправляет медиа в тему пользователя в супергруппе
     
@@ -138,6 +142,7 @@ async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, r
         file_id: ID файла
         caption: Подпись к медиа
         reply_markup: Клавиатура для сообщения
+        entities: Сущности для сообщения
     
     Returns:
         bool: True если сообщение отправлено успешно, False иначе
@@ -146,19 +151,19 @@ async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, r
         # Если супергруппа не используется, отправляем напрямую пользователю
         try:
             if media_type == 'photo':
-                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'video':
-                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'document':
-                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'audio':
-                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'voice':
-                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'video_note':
-                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup)
+                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'sticker':
-                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup)
+                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
             return True
         except Exception as e:
             print(f"Ошибка отправки медиа пользователю {user_id}: {e}")
@@ -172,38 +177,38 @@ async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, r
     
     try:
         if media_type == 'photo':
-            await bot.send_photo(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, photo=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_photo(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'video':
-            await bot.send_video(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_video(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'document':
-            await bot.send_document(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, document=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_document(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'audio':
-            await bot.send_audio(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, audio=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_audio(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'voice':
-            await bot.send_voice(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, voice=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_voice(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'video_note':
-            await bot.send_video_note(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video_note=file_id, reply_markup=reply_markup)
+            await bot.send_video_note(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
         elif media_type == 'sticker':
-            await bot.send_sticker(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, sticker=file_id, reply_markup=reply_markup)
+            await bot.send_sticker(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
         return True
     except Exception as e:
         print(f"Ошибка отправки медиа в тему {topic_id}: {e}")
         # Fallback к пользователю
         try:
             if media_type == 'photo':
-                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'video':
-                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'document':
-                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'audio':
-                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'voice':
-                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup)
+                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'video_note':
-                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup)
+                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
             elif media_type == 'sticker':
-                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup)
+                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
             return True
         except Exception as fallback_error:
             print(f"Ошибка fallback отправки медиа пользователю {user_id}: {fallback_error}")
@@ -329,7 +334,7 @@ async def get_user_from_topic_id(topic_id):
         return None
 
 
-async def send_message_from_topic_to_user(topic_id, text, parse_mode="HTML", reply_markup=None):
+async def send_message_from_topic_to_user(topic_id, text, parse_mode="HTML", reply_markup=None, entities=None):
     """
     Отправляет сообщение из темы пользователю (для обработки сообщений от админов в теме)
     
@@ -353,6 +358,7 @@ async def send_message_from_topic_to_user(topic_id, text, parse_mode="HTML", rep
             chat_id=user_id,
             text=text,
             parse_mode=parse_mode,
+            entities=entities,
             reply_markup=reply_markup
         )
         return True
@@ -361,7 +367,7 @@ async def send_message_from_topic_to_user(topic_id, text, parse_mode="HTML", rep
         return False
 
 
-async def send_media_from_topic_to_user(topic_id, media_type, file_id, caption=None, reply_markup=None):
+async def send_media_from_topic_to_user(topic_id, media_type, file_id, caption=None, reply_markup=None, entities=None):
     """
     Отправляет медиа из темы пользователю (для обработки медиа от админов в теме)
     
@@ -383,19 +389,19 @@ async def send_media_from_topic_to_user(topic_id, media_type, file_id, caption=N
     
     try:
         if media_type == 'photo':
-            await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
         elif media_type == 'video':
-            await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
         elif media_type == 'document':
-            await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
         elif media_type == 'audio':
-            await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
         elif media_type == 'voice':
-            await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup)
+            await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
         elif media_type == 'video_note':
-            await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup)
+            await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities)
         elif media_type == 'sticker':
-            await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup)
+            await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities)
         return True
     except Exception as e:
         print(f"Ошибка отправки медиа пользователю {user_id} из темы {topic_id}: {e}")
@@ -585,7 +591,7 @@ async def send_from_topic(user_id, text=None, photo=None, video=None, document=N
         )
 
 
-async def send(user_id, message, text=None, reply_markup=None):
+async def send(user_id, message, text=None, reply_markup=None, entities=None):
     """
     Универсальная функция для проксирования сообщений между ботом и темой пользователя
     Автоматически определяет источник сообщения и направляет его в нужное место
@@ -594,7 +600,7 @@ async def send(user_id, message, text=None, reply_markup=None):
         user_id: ID пользователя
         message: Объект сообщения (Message) или строка с текстом
         reply_markup: Клавиатура для сообщения
-    
+        entities: Сущности для сообщения
     Returns:
         bool: True если сообщение отправлено успешно, False иначе
     
@@ -618,6 +624,7 @@ async def send(user_id, message, text=None, reply_markup=None):
     # Если передан объект Message
     if hasattr(message, 'content_type'):
         content_type = message.content_type
+        entities = message.entities
         
         if not text:
             text = message.caption if message.caption else message.text
@@ -631,6 +638,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                 return await send_message_from_topic_to_user(
                     topic_id=message.message_thread_id,
                     text=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -638,6 +646,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                 return await send_message_to_user_topic(
                     user_id=user_id,
                     text=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'photo':
@@ -648,6 +657,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='photo',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -656,6 +666,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='photo',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'video':
@@ -666,6 +677,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='video',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -674,6 +686,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='video',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'document':
@@ -684,6 +697,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='document',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -692,6 +706,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='document',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'audio':
@@ -702,6 +717,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='audio',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -710,6 +726,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     media_type='audio',
                     file_id=file_id,
                     caption=text,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'voice':
@@ -737,6 +754,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     topic_id=message.message_thread_id,
                     media_type='video_note',
                     file_id=file_id,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -744,6 +762,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     user_id=user_id,
                     media_type='video_note',
                     file_id=file_id,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         elif content_type == 'sticker':
@@ -753,6 +772,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     topic_id=message.message_thread_id,
                     media_type='sticker',
                     file_id=file_id,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
@@ -760,6 +780,7 @@ async def send(user_id, message, text=None, reply_markup=None):
                     user_id=user_id,
                     media_type='sticker',
                     file_id=file_id,
+                    entities=entities,
                     reply_markup=reply_markup
                 )
         else:
@@ -768,12 +789,14 @@ async def send(user_id, message, text=None, reply_markup=None):
                 return await send_message_from_topic_to_user(
                     topic_id=message.message_thread_id,
                     text=text or "Неподдерживаемый тип сообщения",
+                    entities=entities,
                     reply_markup=reply_markup
                 )
             else:
                 return await send_message_to_user_topic(
                     user_id=user_id,
                     text=text or "Неподдерживаемый тип сообщения",
+                    entities=entities,
                     reply_markup=reply_markup
                 )
     
@@ -782,6 +805,7 @@ async def send(user_id, message, text=None, reply_markup=None):
         return await send_message_to_user_topic(
             user_id=user_id,
             text=message,
+            entities=entities,
             reply_markup=reply_markup
         )
     
