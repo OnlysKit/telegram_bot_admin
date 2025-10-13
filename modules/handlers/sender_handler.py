@@ -1,5 +1,5 @@
 from aiogram import Router
-from aiogram.filters import F
+from aiogram import F
 from aiogram.types import Message
 from modules.utils.messages_provider import send
 

@@ -181,11 +181,16 @@ def generate_secure_uuid(length=12):
     characters = string.ascii_letters + string.digits
     return ''.join(secrets.choice(characters) for _ in range(length))
 
-async def hyperformula(link, capture, cap_type):
+async def hyperformula(link, capture, cap_type='text'):
     if cap_type == 'text':
         return f'=HYPERLINK("{link}"; "{capture}")'
     elif cap_type == 'picture':
         return f'=HYPERLINK("{link}"; IMAGE("{capture}"; 2))'
+    
+
+async def tg_hyperlink(link, text):
+    return f'<a href="{link}f">{text}</a>'
+
 
 def format_time(time_str):
     pattern = r'^(?:\d{2}:\d{2}|\d{4})$'

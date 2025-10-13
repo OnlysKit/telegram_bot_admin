@@ -505,7 +505,7 @@ async def reset_telegram_image_id(product_id: int, auth: bool = Depends(require_
 async def create_tables():
     await db.creator(table='products', column_types={'title': 'TEXT', 'description': 'TEXT', 'image': 'TEXT', 'video': 'TEXT', 'is_free': 'INTEGER',
                                                'price': 'INTEGER', 'discount': 'INTEGER', 'file_type': 'TEXT', 'product_bot': 'TEXT', 'path': 'TEXT', 'link': 'TEXT',
-                                               'telegram_file_id': 'TEXT', 'telegram_video_id': 'TEXT', 'telegram_image_id': 'TEXT'})
+                                               'telegram_file_id': 'TEXT', 'telegram_video_id': 'TEXT', 'telegram_image_id': 'TEXT', 'unique_product_id': 'TEXT'})
     await db.creator(table='bots', column_types={'title': 'TEXT', 'bot_id': 'INTEGER', 'bot_token': 'TEXT', 'bot_username': 'TEXT'})
     await db.creator(table='users', column_types={'user_id': 'INTEGER', 'topic_id': 'INTEGER', 'username': 'TEXT',
                                                'first_name': 'TEXT', 'last_name': 'TEXT', 'source': 'TEXT', 
