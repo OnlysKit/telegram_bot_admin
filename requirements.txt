@@ -1,0 +1,4 @@
+aiogram
+aiosqlite
+yookassa
+yt-dlp

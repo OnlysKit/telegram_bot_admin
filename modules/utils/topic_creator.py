@@ -1,11 +1,17 @@
 from modules.bot.bot import bot
 from modules.utils import db
 from modules.configs.config import SUPER_GROUP_ID, USE_SUPER_GROUP
+from modules.utils.messages_provider import check_supergroup_access
 
 
 async def create_topic(user_id):
     
     if USE_SUPER_GROUP:
+        
+        # Проверяем доступность супергруппы
+        if not await check_supergroup_access():
+            print(f"Супергруппа недоступна, пропускаем создание темы для пользователя {user_id}")
+            return
         
         try:
             
@@ -31,6 +37,7 @@ async def create_topic(user_id):
                 topic_id = created_topic.message_thread_id
                 
                 await db.update_generic_async(columns=['topic_id'], values=[topic_id], table='users', user_id=user_id)
+                print(f"Создана тема {topic_id} для пользователя {user_id}")
         
         except Exception as e:
             print(f"Ошибка при создании темы для пользователя {user_id}: {e}")

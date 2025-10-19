@@ -2,12 +2,12 @@ import asyncio
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, menu_button
+from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton, menu_button, FSInputFile
 from modules.bot.bot import bot
 from modules.utils import db
 from modules.utils.bot_fn import inline_menu
 from modules.configs.config import SUPER_GROUP_ID
-from modules.utils.messages_provider import send
+from modules.utils.messages_provider import send, send_to_supergroup
 from modules.utils.topic_creator import create_topic
 
 router = Router()
@@ -46,7 +46,7 @@ async def cmd_start(message: types.Message, command: Command):
                             values=[user_id, username, first_name, last_name, source], table='users')
         
     await create_topic(user_id)
-    await send(user_id=user_id, message=message, text=f"@{username} запустил бота\nИсточник: #{source}\nПродукт: #{product}")
+    await send_to_supergroup(user_id=user_id, text=f"@{username} запустил бота\nИсточник: #{source}\nПродукт: #{product}")
     
     product_link = product if product else 'main'
     product_data = await db.get_one_generic_async(table='products', link=product_link)
@@ -59,6 +59,9 @@ async def cmd_start(message: types.Message, command: Command):
     product_is_free = product_data['is_free']
     product_price = product_data['price']
     product_discount = product_data['discount']
+    unique_product_id = product_data['unique_product_id']
+    
+    purchased_data = await db.get_one_generic_async(table='purchased', user_id=user_id, product_id=product_id)
     
     menu_button = "Скачать"
     menu_callback = "download"
@@ -73,7 +76,7 @@ async def cmd_start(message: types.Message, command: Command):
     if product_description:
         text += f"\n\n<i>{product_description}</i>"
     
-    if not product_is_free:
+    if not product_is_free and not purchased_data:
         text += f"\n\n<b>Стоимость:</b> <i>{end_price} руб.</i>"
         menu_button = "Оплатить и скачать"
         menu_callback = "pay"
@@ -84,6 +87,19 @@ async def cmd_start(message: types.Message, command: Command):
         message_to_user = await bot.send_message(chat_id=user_id, text=text, reply_markup=markup)
         
     else:
-        pass
+        
+        try:
+            if product_image:
+                file_path = f"products/{unique_product_id}/media/photos/image.jpg"
+                media_file = FSInputFile(file_path)
+                message_to_user = await bot.send_photo(chat_id=user_id, photo=media_file, caption=text, reply_markup=markup)
+            
+            elif product_video:
+                file_path = f"products/{unique_product_id}/media/video.mp4"
+                media_file = FSInputFile(file_path)
+                message_to_user = await bot.send_video(chat_id=user_id, video=media_file, caption=text, reply_markup=markup)
+        except: 
+            # На всякий случай
+            message_to_user = await bot.send_message(chat_id=user_id, text=text, reply_markup=markup)
     
-    await send(user_id=user_id, message=message_to_user)
+    await send_to_supergroup(user_id=user_id, text=f"Отправлено сообщение пользователю: {product_title}")

@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name": "TESTBOT. MAIN.PY",
+      "cwd": "/root/TESTBOT",
+      "script": "main.py",
+      "interpreter": "/root/TESTBOT/venv/bin/python3",
+      "watch": false,
+      "autorestart": true,
+      "env": {
+          "PYTHONUNBUFFERED": "1"
+      },
+      "output": "/root/TESTBOT/logs/run_out.log",
+      "error": "/root/TESTBOT/logs/run_err.log"
+  }
+  ]
+}

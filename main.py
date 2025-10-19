@@ -26,6 +26,7 @@ async def create_tables():
                                                'is_admin': 'INTEGER', 'is_moderator': 'INTEGER', 'banned': 'INTEGER',
                                                'tariff': 'TEXT', 'bot_username': 'TEXT', 'bot_id': 'INTEGER',
                                                })
+    await creator(table='purchased', column_types={'user_id': 'INTEGER', 'product_id': 'INTEGER', 'step': 'TEXT', 'paid': 'INTEGER'})
 
 if __name__ == "__main__":
     asyncio.run(create_tables())

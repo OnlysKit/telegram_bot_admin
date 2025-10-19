@@ -3,7 +3,7 @@ from aiogram import types
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup, WebAppInfo
 from modules.bot.bot import bot
 from modules.utils import db
-from modules.configs.config import SUPER_GROUP_ID, USE_SUPER_GROUP
+from modules.configs.config import SUPER_GROUP_ID, USE_SUPER_GROUP, bot_id
 
 
 async def safe_send_to_topic(bot, group_id, topic_id, text, user_id=None, fallback_to_user=True):
@@ -70,6 +70,24 @@ async def get_user_topic_id(user_id):
         return None
 
 
+async def check_supergroup_access():
+    """
+    Проверяет доступность супергруппы
+    
+    Returns:
+        bool: True если супергруппа доступна, False иначе
+    """
+    if not USE_SUPER_GROUP:
+        return False
+        
+    try:
+        chat_info = await bot.get_chat(SUPER_GROUP_ID)
+        return chat_info is not None
+    except Exception as e:
+        print(f"Супергруппа {SUPER_GROUP_ID} недоступна: {e}")
+        return False
+
+
 async def send_message_to_user_topic(user_id, text, parse_mode=None, reply_markup=None, entities=None):
     """
     Отправляет сообщение в тему пользователя в супергруппе
@@ -99,6 +117,11 @@ async def send_message_to_user_topic(user_id, text, parse_mode=None, reply_marku
             print(f"Ошибка отправки сообщения пользователю {user_id}: {e}")
             return False
     
+    # Проверяем доступность супергруппы
+    if not await check_supergroup_access():
+        print(f"Супергруппа недоступна, пропускаем отправку в супергруппу для пользователя {user_id}")
+        return False
+    
     topic_id = await get_user_topic_id(user_id)
     
     if not topic_id:
@@ -117,19 +140,7 @@ async def send_message_to_user_topic(user_id, text, parse_mode=None, reply_marku
         return True
     except Exception as e:
         print(f"Ошибка отправки сообщения в тему {topic_id}: {e}")
-        # Fallback к пользователю
-        try:
-            await bot.send_message(
-                chat_id=user_id, 
-                text=text, 
-                parse_mode=parse_mode,
-                entities=entities,
-                reply_markup=reply_markup
-            )
-            return True
-        except Exception as fallback_error:
-            print(f"Ошибка fallback отправки пользователю {user_id}: {fallback_error}")
-            return False
+        return False
 
 
 async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, reply_markup=None, entities=None):
@@ -151,23 +162,28 @@ async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, r
         # Если супергруппа не используется, отправляем напрямую пользователю
         try:
             if media_type == 'photo':
-                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'video':
-                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'document':
-                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'audio':
-                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'voice':
-                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'video_note':
-                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             elif media_type == 'sticker':
-                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
+                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
             return True
         except Exception as e:
             print(f"Ошибка отправки медиа пользователю {user_id}: {e}")
             return False
+    
+    # Проверяем доступность супергруппы
+    if not await check_supergroup_access():
+        print(f"Супергруппа недоступна, пропускаем отправку медиа в супергруппу для пользователя {user_id}")
+        return False
     
     topic_id = await get_user_topic_id(user_id)
     
@@ -177,42 +193,23 @@ async def send_media_to_user_topic(user_id, media_type, file_id, caption=None, r
     
     try:
         if media_type == 'photo':
-            await bot.send_photo(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_photo(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, photo=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'video':
-            await bot.send_video(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_video(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'document':
-            await bot.send_document(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_document(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, document=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'audio':
-            await bot.send_audio(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_audio(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, audio=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'voice':
-            await bot.send_voice(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_voice(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, voice=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'video_note':
-            await bot.send_video_note(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_video_note(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, video_note=file_id, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         elif media_type == 'sticker':
-            await bot.send_sticker(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
+            await bot.send_sticker(chat_id=SUPER_GROUP_ID, message_thread_id=topic_id, sticker=file_id, reply_markup=reply_markup, caption_entities=entities, parse_mode=None)
         return True
     except Exception as e:
         print(f"Ошибка отправки медиа в тему {topic_id}: {e}")
-        # Fallback к пользователю
-        try:
-            if media_type == 'photo':
-                await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'video':
-                await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'document':
-                await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'audio':
-                await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'voice':
-                await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'video_note':
-                await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            elif media_type == 'sticker':
-                await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities, parse_mode=None)
-            return True
-        except Exception as fallback_error:
-            print(f"Ошибка fallback отправки медиа пользователю {user_id}: {fallback_error}")
-            return False
+        return False
 
 
 async def send_media_group_to_user_topic(user_id, media_list, reply_markup=None):
@@ -236,6 +233,11 @@ async def send_media_group_to_user_topic(user_id, media_list, reply_markup=None)
             print(f"Ошибка отправки медиагруппы пользователю {user_id}: {e}")
             return False
     
+    # Проверяем доступность супергруппы
+    if not await check_supergroup_access():
+        print(f"Супергруппа недоступна, пропускаем отправку медиагруппы в супергруппу для пользователя {user_id}")
+        return False
+    
     topic_id = await get_user_topic_id(user_id)
     
     if not topic_id:
@@ -252,13 +254,7 @@ async def send_media_group_to_user_topic(user_id, media_list, reply_markup=None)
         return True
     except Exception as e:
         print(f"Ошибка отправки медиагруппы в тему {topic_id}: {e}")
-        # Fallback к пользователю
-        try:
-            await bot.send_media_group(chat_id=user_id, media=media_list, reply_markup=reply_markup)
-            return True
-        except Exception as fallback_error:
-            print(f"Ошибка fallback отправки медиагруппы пользователю {user_id}: {fallback_error}")
-            return False
+        return False
 
 
 async def forward_message_to_user_topic(user_id, from_chat_id, message_id, reply_markup=None):
@@ -287,6 +283,11 @@ async def forward_message_to_user_topic(user_id, from_chat_id, message_id, reply
             print(f"Ошибка пересылки сообщения пользователю {user_id}: {e}")
             return False
     
+    # Проверяем доступность супергруппы
+    if not await check_supergroup_access():
+        print(f"Супергруппа недоступна, пропускаем пересылку в супергруппу для пользователя {user_id}")
+        return False
+    
     topic_id = await get_user_topic_id(user_id)
     
     if not topic_id:
@@ -303,17 +304,7 @@ async def forward_message_to_user_topic(user_id, from_chat_id, message_id, reply
         return True
     except Exception as e:
         print(f"Ошибка пересылки сообщения в тему {topic_id}: {e}")
-        # Fallback к пользователю
-        try:
-            await bot.forward_message(
-                chat_id=user_id,
-                from_chat_id=from_chat_id,
-                message_id=message_id
-            )
-            return True
-        except Exception as fallback_error:
-            print(f"Ошибка fallback пересылки сообщения пользователю {user_id}: {fallback_error}")
-            return False
+        return False
 
 
 async def get_user_from_topic_id(topic_id):
@@ -328,7 +319,11 @@ async def get_user_from_topic_id(topic_id):
     """
     try:
         user_topic_info = await db.get_one_generic_async(table='users', topic_id=topic_id)
-        return user_topic_info['user_id'] if user_topic_info else None
+        if user_topic_info:
+            return user_topic_info['user_id']
+        else:
+            print(f"Пользователь для темы {topic_id} не найден в базе данных")
+            return None
     except Exception as e:
         print(f"Ошибка получения пользователя по теме {topic_id}: {e}")
         return None
@@ -361,6 +356,7 @@ async def send_message_from_topic_to_user(topic_id, text, parse_mode="HTML", rep
             entities=entities,
             reply_markup=reply_markup
         )
+        print(f"Сообщение из темы {topic_id} отправлено пользователю {user_id}")
         return True
     except Exception as e:
         print(f"Ошибка отправки сообщения пользователю {user_id} из темы {topic_id}: {e}")
@@ -389,19 +385,19 @@ async def send_media_from_topic_to_user(topic_id, media_type, file_id, caption=N
     
     try:
         if media_type == 'photo':
-            await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
+            await bot.send_photo(chat_id=user_id, photo=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'video':
-            await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
+            await bot.send_video(chat_id=user_id, video=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'document':
-            await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
+            await bot.send_document(chat_id=user_id, document=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'audio':
-            await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
+            await bot.send_audio(chat_id=user_id, audio=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'voice':
-            await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, entities=entities)
+            await bot.send_voice(chat_id=user_id, voice=file_id, caption=caption, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'video_note':
-            await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, entities=entities)
+            await bot.send_video_note(chat_id=user_id, video_note=file_id, reply_markup=reply_markup, caption_entities=entities)
         elif media_type == 'sticker':
-            await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, entities=entities)
+            await bot.send_sticker(chat_id=user_id, sticker=file_id, reply_markup=reply_markup, caption_entities=entities)
         return True
     except Exception as e:
         print(f"Ошибка отправки медиа пользователю {user_id} из темы {topic_id}: {e}")
@@ -591,6 +587,27 @@ async def send_from_topic(user_id, text=None, photo=None, video=None, document=N
         )
 
 
+async def send_to_supergroup(user_id, text, reply_markup=None, entities=None):
+    """
+    Отправляет сообщение в супергруппу (в тему пользователя)
+    
+    Args:
+        user_id: ID пользователя
+        text: Текст сообщения
+        reply_markup: Клавиатура для сообщения
+        entities: Сущности для сообщения
+    
+    Returns:
+        bool: True если сообщение отправлено успешно, False иначе
+    """
+    return await send_message_to_user_topic(
+        user_id=user_id,
+        text=text,
+        entities=entities,
+        reply_markup=reply_markup
+    )
+
+
 async def send(user_id, message, text=None, reply_markup=None, entities=None):
     """
     Универсальная функция для проксирования сообщений между ботом и темой пользователя
@@ -621,6 +638,10 @@ async def send(user_id, message, text=None, reply_markup=None, entities=None):
         ])
         await send(12345, "Выберите действие:", reply_markup=keyboard)
     """
+    
+    if user_id == bot_id:
+        return
+    
     # Если передан объект Message
     if hasattr(message, 'content_type'):
         content_type = message.content_type
